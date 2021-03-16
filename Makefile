@@ -14,20 +14,34 @@ CFLAGS := -Wall -I$(INC_DIR)
 INCS_FILES = $(wildcard $(INC_DIR)/*.h)
 SRCS_FILES = $(wildcard $(SRC_DIR)/*.c)
 OBJS_FILES = $(SRCS_FILES:$(SRC_DIR)/%.c=$(OBJ_DIR)/%.o)
-TARGET_FILES := $(BIN_DIR)/$(PROD_ENTRY)
+TARGET_FILES := $(SRCS_FILES:$(SRC_DIR)/%.c=$(BIN_DIR)/%)
 
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
 	@mkdir -p $(OBJ_DIR)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-main:	$(OBJS_FILES)
+all: list power_of_two bitcpy cstr_bin
+
+list:	$(OBJS_FILES)
 	@mkdir -p $(BIN_DIR)
-	gcc -o $(TARGET_FILES) $(OBJS_FILES)
+	gcc -o $(BIN_DIR)/list $(OBJ_DIR)/list.o
+
+power_of_two: $(OBJS_FILES)
+	@mkdir -p $(BIN_DIR)
+	gcc -o $(BIN_DIR)/power_of_two $(OBJ_DIR)/power_of_two.o
+
+bitcpy: $(OBJS_FILES)
+	@mkdir -p $(BIN_DIR)
+	gcc -o $(BIN_DIR)/bitcpy $(OBJ_DIR)/bitcpy.o
+
+cstr_bin: $(OBJS_FILES)
+	@mkdir -p $(BIN_DIR)
+	gcc -o $(BIN_DIR)/cstr_bin $(OBJ_DIR)/cstr.o $(OBJ_DIR)/cstr_bin.o
 
 clean:
-	-rm $(OBJ_DIR)/*.o $(TARGET_FILES)
+	-rm $(OBJ_DIR)/*.o $(BIN_DIR)/*
 
-valgrind: main
+valgrind: all
 	@valgrind --leak-check=full $(TARGET_FILES)
 
 cppcheck:
